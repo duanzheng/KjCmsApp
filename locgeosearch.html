@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>开心洗衣</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="css/mui.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+        <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body class="locsearch-body">
+        <header class="mui-bar mui-bar-nav locsearch-header">
+        	<!--<form>-->
+            <input type="text" id="searchInput" placeholder="     请输入关键字" />
+            <!--</form>-->
+            <span class="mui-icon mui-icon-search locsearch-icon"></span>
+            <a class="mui-btn mui-btn-link" id="btnCancel" style="color: #FFFFFF;">取消</a>
+        </header>
+        <div class="mui-content locsearch-content">
+            <ul class="mui-table-view" id="locsearch-list">
+            </ul>
+        </div>
+        <script>
+        	var btnCancel = document.getElementById("btnCancel");
+            var cancelWidth = btnCancel.offsetWidth;
+            var inputWidth = window.innerWidth - cancelWidth - 30;
+            var searchInput = document.getElementById("searchInput");
+            searchInput.style.width = inputWidth + "px";
+            mui.trigger(searchInput,"focusin");
+
+            btnCancel.addEventListener("tap", function() {
+                mui.currentWebview.close();
+            });
+                
+            var selectGeoLocation = function(id, name) {
+                console.log("selectGeoLocation");
+		        plus.webview.getWebviewById("index.html").evalJS("selectGeoLocation('" + id + "', '" + name + "')");
+		        mui.currentWebview.close();
+		        if (plus.webview.getWebviewById("locationview")) {
+	              plus.webview.getWebviewById("locationview").close();
+	            }
+            };
+
+            mui.plusReady(function() {
+                kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+
+                var searchText = "";
+                var lastTime = new Date();
+
+                // 此框架中监听不到input输入变化事件，只能先用timer定时检测的方式，待改善
+                var checkTextChange = function() {
+                    var curTime = new Date();
+                    if (curTime - lastTime < 3000) {//使用百度地图接口，连续输入的时候不进行处理
+                        setTimeout(checkTextChange, 1000);
+                        return;
+                    }
+                    lastTime = curTime;
+                    var text = searchInput.value;
+                    if (text != null) {
+                        if (text != searchText) {
+                            searchText = text;
+                            console.log("start to search : " + searchText);
+                            kj.shop.searchGeoLocation(searchText, "locsearch-list");
+                        }
+                    }
+                    setTimeout(checkTextChange, 1000);
+                };
+
+                checkTextChange();
+            });
+        </script>
+    </body>
+</html>

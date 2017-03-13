@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/shopAjax.js"></script>
+    <script src="js/miniScroll.js"></script>
+    <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css">
+        #gongao {
+            width: 100%;
+            height: 30px;
+            overflow: hidden;
+            line-height: 30px;
+            font-size: 15px;
+            background: #EAEAEA;
+            color: #808A87;
+        }
+
+        #gongao #scroll_begin, #gongao #scroll_end {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript">
+        function ScrollImgLeft() {
+            var speed = 50;
+            var scroll_begin = document.getElementById("scroll_begin");
+            var scroll_end = document.getElementById("scroll_end");
+            var scroll_div = document.getElementById("scroll_div");
+            scroll_end.innerHTML = scroll_begin.innerHTML;
+            function Marquee() {
+                if (scroll_end.offsetWidth - scroll_div.scrollLeft <= 0)
+                    scroll_div.scrollLeft -= scroll_begin.offsetWidth;
+                else
+                    scroll_div.scrollLeft++;
+            }
+
+            var MyMar = setInterval(Marquee, speed);
+            scroll_div.onmouseover = function () {
+                clearInterval(MyMar);
+            }
+            scroll_div.onmouseout = function () {
+                MyMar = setInterval(Marquee, speed);
+            }
+        }
+    </script>
+</head>
+<body class="shop-body">
+<header class="mui-bar mui-bar-nav order-header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: #FFFFFF"></a>
+    <a class="mui-pull-right mui-icon mui-icon-home" id="btnShopInfo" style="color: #FFFFFF"></a>
+
+    <h1 class="mui-title" id="shop_name"  style="color: #FFFFFF"></h1>
+</header>
+<nav class="mui-bar mui-bar-tab">
+    <a class="mui-tab-item mui-active">
+        <span class="mui-tab-label"><button id="btn-order">我要洗衣</button></span>
+    </a>
+</nav>
+<section class="shop-comment-section" style="margin-top: 44px;">
+        店铺评分：
+        <div id="shop-comment-five"></div>
+</section>
+<div id="gongao">
+    <a onclick='kj.shop.openWithMui("shopinfo.html", "shopinfo", true)' style="color: #40CE54;">
+        <div style="width:100%;height:30px;margin:0 auto;white-space: nowrap;overflow:hidden;" id="scroll_div" class="scroll_div">
+            <div id="scroll_begin">
+            </div>
+            <div id="scroll_end"></div>
+        </div>
+    </a>
+    <!--<script type="text/javascript">ScrollImgLeft();</script> -->
+</div>
+<div id="actDiv" style="display: none;">
+    <ul class="mui-table-view" id="act-list">
+        <li class="mui-table-view-divider">活动公告</li>
+
+    </ul>
+</div>
+<div>
+    <ul class="mui-table-view" id="shop-prodlist">
+    </ul>
+</div>
+
+<script>
+    mui.init({
+        swipeBack: true
+    });
+
+    var setBaseInfo = function () {
+        kj.shop.getShopInfo(function (data) {
+            document.getElementById("scroll_begin").innerHTML = "公告：" + data.info.shop_desc + " ";
+            
+            ScrollImgLeft();
+            if (data.info.shop_support_score == 0) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-five";
+            } else if (data.info.shop_support_score > 0 && data.info.shop_support_score <= 0.5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-half";
+            } else if (data.info.shop_support_score > 0.5 && data.info.shop_support_score <= 1) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-one";
+            } else if (data.info.shop_support_score > 1 && data.info.shop_support_score <= 1.5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-one-half";
+            } else if (data.info.shop_support_score > 1.5 && data.info.shop_support_score <= 2) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-two";
+            } else if (data.info.shop_support_score > 2 && data.info.shop_support_score <= 2.5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-two-half";
+            } else if (data.info.shop_support_score > 2.5 && data.info.shop_support_score <= 3) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-three";
+            } else if (data.info.shop_support_score > 3 && data.info.shop_support_score <= 3.5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-three-half";
+            } else if (data.info.shop_support_score > 3.5 && data.info.shop_support_score <= 4) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-four";
+            } else if (data.info.shop_support_score > 4 && data.info.shop_support_score <= 4.5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-four-half";
+            } else if (data.info.shop_support_score > 4.5 && data.info.shop_support_score <= 5) {
+                document.getElementsByTagName('div')[0].id = "shop-comment-five";
+            }
+            //document.getElementById("shop-comment").innerHTML = "星级评分：" + data.info.shop_support_score;
+            //data.acts[0].article_title;
+            var acts = data.acts;
+            var domHtml = '';
+            domHtml += '<li class="mui-table-view-divider">活动公告</li>';
+            if (acts && acts.length > 0) {
+                var actDiv = document.getElementById("actDiv");
+                actDiv.style.display = 'block';
+                var data = [];
+                for (var i = 0; i < acts.length; i++) {
+                    var url = "javascript:void();";
+                    data.push({url: url, text: acts[i].article_title});
+                    domHtml += '<li class="mui-table-view-cell mui-media">';
+                    domHtml += '<label class="mui-pull-left">' + acts[i].article_title + '</label>';
+                    domHtml += '</li>';
+                }
+                /*var scrollControl = new tinyScroll({"data":data, "element":document.getElementById("shop-noti")});*/
+                document.getElementById("act-list").innerHTML = domHtml;
+            }
+        });
+    };
+
+    mui.plusReady(function () {
+        var self = plus.webview.currentWebview();
+        var name = self.name;
+        document.getElementById("shop_name").innerHTML = name;
+
+        kj.context = kj.initContext();
+        kj.shop = kj.initShop();
+        kj.shop.drawProdList("shop-prodlist");
+        document.getElementById('btn-order').addEventListener('tap', function () {
+            mui.openWindow({
+                url: 'order.html',
+                id: 'info'
+            });
+        });
+        document.getElementById("btnShopInfo").addEventListener("tap", function () {
+            kj.shop.openWithMui("shopinfo.html", "shopinfo", true);
+        });
+
+        setBaseInfo();
+
+    });
+</script>
+</body>
+</html>
+

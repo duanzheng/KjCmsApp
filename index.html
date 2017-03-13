@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/shopAjax.js"></script>
+    <script src="http://api.map.baidu.com/api?v=1.2"></script>
+    <script src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+    <style>
+		html,
+		body {
+			background-color: #efeff4;
+		}
+		#pull{
+			text-align: left;
+		}
+		@-webkit-keyframes spin {
+			0% {
+				-webkit-transform: rotate(0deg);
+			}
+			100% {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+	</style>
+    <script>
+        mui.init();
+    </script>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav order-header">
+    <a id="btnInfo" class="mui-icon mui-icon-search mui-pull-right" style="color: #FFFFFF"></a>
+
+    <h1 id="btnToLoc" class="mui-title">
+        <a>
+            <span class="mui-icon mui-icon-location"></span>
+            <span id="selectedArea">正在定位…</span>
+        </a>
+    </h1>
+</header>
+<div class="mui-content">
+	<div class="mui-pull-top-pocket">
+		<div class="mui-pull">
+			<div id="icon" class="mui-pull-loading mui-icon mui-icon-pulldown"></div>
+			<div id="text" class="mui-pull-caption">下拉可以刷新</div>
+		</div>
+	</div>
+</div>
+<script>
+	var sub;
+	
+	var init = function() {
+		kj.context = kj.initContext();
+        kj.shop = kj.initShop();
+        
+        var subpage_style = {
+            top: '44px',
+            bottom: '0px',
+            bounce: "vertical"
+        };
+        //创建商铺列表
+        sub = plus.webview.create("mainShopList.html", "mainShopList", subpage_style);
+        var self = plus.webview.currentWebview();
+        self.append(sub);
+        sub.addEventListener("dragBounce", onPullStateChange, false);
+        sub.setBounce({
+			position: {
+				top: "100px"
+			},
+			changeoffset: {
+				top: "50px"
+			}
+		});
+				
+		var wait = plus.nativeUI.showWaiting();
+		
+        // 获取所有位置信息
+        kj.shop.loadLocations();
+
+    	//获取当前定位
+        kj.shop.getCurrentLocation(function (data) {
+            if (data) {
+                kj.shop.setCurrentCity(data.content.address_detail.city_code);
+                document.getElementById("selectedArea").innerHTML = kj.shop.getSelectedArea();
+                
+                plus.webview.getWebviewById("mainShopList").reload();
+					
+		        console.log("load message success!");
+		        wait.close();
+            }
+            else {
+            	var sub = plus.webview.create("warnPage.html", "warnPage", subpage_style);
+		        var self = plus.webview.currentWebview();
+		        
+		        console.log("load message failed!");
+            	wait.close();
+            }
+        });
+
+        //首页返回键处理
+        //处理逻辑：1秒内，连续两次按返回键，则退出应用；
+        var first = null;
+        plus.key.addEventListener('backbutton', function () {
+            //首次按键，提示‘再按一次退出应用’
+            if (!first) {
+                first = new Date().getTime();
+                mui.toast('再按一次退出应用');
+                setTimeout(function () {
+                    first = null;
+                }, 1000);
+            } else {
+                if (new Date().getTime() - first < 1000) {
+                    plus.runtime.quit();
+                }
+            }
+        }, false);
+	};
+	
+    mui.plusReady(init);
+
+    document.getElementById("btnToLoc").addEventListener("tap", function () {
+        console.log("tap on location input box !");
+        kj.shop.openWithMui("location.html", "locationview", true);
+    });
+
+    document.getElementById("btnInfo").addEventListener("tap", function () {
+        console.log("tap on location search button !");
+//      kj.shop.openWithMui("locsearch.html", "locsearchview", true);
+        mui.openWindow({
+            id: "locsearch",
+            url: "locsearch.html",
+            extras: null,
+            show: {
+                autoShow: true,
+                aniShow: "fade-in"
+            },
+            waiting: {
+                autoShow: false
+            }
+        });
+    });
+
+    var modifyLocName = function (newName) {
+        document.getElementById("selectedArea").innerHTML = newName;
+    };
+
+    var selectCurrentLoc = function () {
+        kj.shop.selectCurrentLocation();
+    };
+
+    var selectGeoLocation = function (id, name) {
+        kj.shop.selectGeoLocation(id, name);
+    };
+    
+     // DOMContentLoaded事件处理
+	var etext = null,
+		eicon = null;
+	document.addEventListener("DOMContentLoaded", function() {
+		etext = document.getElementById("text");
+		eicon = document.getElementById("icon");
+	}, false);
+
+	 // 下拉状态改变
+	function onPullStateChange(e) {
+		switch (e.status) {
+			case "beforeChangeOffset": //下拉可刷新状态
+				pull1();
+				break;
+			case "afterChangeOffset": //松开可刷新状态
+				pull2();
+				break;
+			case "dragEndAfterChangeOffset": //正在刷新状态
+				sub.evalJS("pulldownRefresh();");
+				pull3();
+				break;
+			default:
+				break;
+		}
+	}
+
+	function pull1() {
+		etext.innerText = "下拉可以刷新";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-pulldown';
+		eicon.style.webkitTransition = "all 0.3s ease-in";
+		eicon.style.webkitTransform = "rotate(0deg)";
+	}
+
+	function pull2() {
+		etext.innerText = "释放立即刷新";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-pulldown';
+		eicon.style.webkitTransition = "all 0.3s ease-in";
+		eicon.style.webkitTransform = "rotate(180deg)";
+	}
+
+	function pull3() {
+		etext.innerText = "正在刷新...";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-spinner-cycle';
+		eicon.style.webkitAnimation = "spin 1s infinite linear";
+	}
+
+	function pullReset() {
+		etext.innerText = "下拉可刷新";
+		eicon.style.webkitTransition = "";
+		eicon.style.webkitTransform = "";
+		eicon.style.webkitAnimation = "";
+	}
+</script>
+</body>
+</html>

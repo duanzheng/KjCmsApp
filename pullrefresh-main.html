@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <style>
+		html,
+		body {
+			background-color: #efeff4;
+		}
+		#pull{
+			text-align: left;
+		}
+		@-webkit-keyframes spin {
+			0% {
+				-webkit-transform: rotate(0deg);
+			}
+			100% {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+<header class="mui-bar mui-bar-nav order-header">
+    <a id="btnSearch" class="mui-icon mui-icon-search mui-pull-right" style="color: #FFFFFF"></a>
+    <a class="mui-icon mui-pull-left"></a>
+
+    <h1 class="mui-title">我的订单</h1>
+</header>
+<div class="mui-content">
+	<div class="mui-pull-top-pocket">
+		<div class="mui-pull">
+			<div id="icon" class="mui-pull-loading mui-icon mui-icon-pulldown"></div>
+			<div id="text" class="mui-pull-caption">下拉可以刷新</div>
+		</div>
+	</div>
+</div>
+<script>
+    mui.init();
+    
+    var sub;
+    var init = function () {
+    	var subpage_style = {
+            top: '48px',
+            bottom: '0px',
+            bounce: "vertical"
+        };
+        
+        sub = plus.webview.create("pullrefresh-content.html", "pullrefresh-content", subpage_style);
+        var self = plus.webview.currentWebview();
+        self.append(sub);
+        sub.addEventListener("dragBounce", onPullStateChange, false);
+        sub.setBounce({
+			position: {
+				top: "100px"
+			},
+			changeoffset: {
+				top: "50px"
+			}
+		});
+    };
+    
+    mui.plusReady(init);
+    
+    document.getElementById('btnSearch').addEventListener('tap', function () {
+        mui.openWindow({
+            id: 'hisOder',
+            url: 'hisOder.html',
+            extras: null,
+            show: {
+                autoShow: true
+            },
+            waiting: {
+                autoShow: false
+            }
+        });
+    });
+        
+    // DOMContentLoaded事件处理
+	var etext = null,
+		eicon = null;
+	document.addEventListener("DOMContentLoaded", function() {
+		etext = document.getElementById("text");
+		eicon = document.getElementById("icon");
+	}, false);
+
+	// 下拉状态改变
+	function onPullStateChange(e) {
+		switch (e.status) {
+			case "beforeChangeOffset": //下拉可刷新状态
+				pull1();
+				break;
+			case "afterChangeOffset": //松开可刷新状态
+				pull2();
+				break;
+			case "dragEndAfterChangeOffset": //正在刷新状态
+				sub.evalJS("pulldownRefresh();");
+				pull3();
+				break;
+			default:
+				break;
+		}
+	}
+
+	function pull1() {
+		etext.innerText = "下拉可以刷新";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-pulldown';
+		eicon.style.webkitTransition = "all 0.3s ease-in";
+		eicon.style.webkitTransform = "rotate(0deg)";
+	}
+
+	function pull2() {
+		etext.innerText = "释放立即刷新";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-pulldown';
+		eicon.style.webkitTransition = "all 0.3s ease-in";
+		eicon.style.webkitTransform = "rotate(180deg)";
+	}
+
+	function pull3() {
+		etext.innerText = "正在刷新...";
+		eicon.className = 'mui-pull-loading mui-icon mui-icon-spinner-cycle';
+		eicon.style.webkitAnimation = "spin 1s infinite linear";
+	}
+
+	function pullReset() {
+		etext.innerText = "下拉可刷新";
+		eicon.style.webkitTransition = "";
+		eicon.style.webkitTransform = "";
+		eicon.style.webkitAnimation = "";
+	}
+</script>
+</body>
+</html>

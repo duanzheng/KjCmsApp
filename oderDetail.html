@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>开心洗衣</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="css/mui.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+        <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body class="order-body">
+        <header class="mui-bar mui-bar-nav order-header">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">订单详情</h1>
+        </header>
+       
+       <div class="mui-content">
+			<ul class="mui-table-view" >
+				<li class="mui-table-view-cell mui-media" id="shopNameLi">
+			<a class="mui-navigate-right">
+				<div id="shopName" class="mui-media-body" class="mui-segmented-control" style="display:block;">
+		</div>
+			</a>
+		</li>
+		<li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">订单状态：</label>
+			       <label class="mui-pull-loading"  id="oderState"></label>
+		       </li>
+				<li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">订单号码：</label>
+			       <label class="mui-pull-loading"  id="orderNumber"></label>
+		       </li>
+				<li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">取衣时间：</label>
+			       <label class="mui-pull-loading"  id="arrive"></label>
+		       </li>
+		       <li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">下单时间：</label>
+			       <label class="mui-pull-loading"  id="oderTime"></label>
+		       </li>
+		       <li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">手机号码：</label>
+			       <label class="mui-pull-loading"  id="oderPhone"></label>
+		       </li>
+		       <li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">联系地址：</label>
+			       <label class="mui-pull-loading"  id="oderAddr"></label>
+		       </li>
+		       <li class="mui-table-view-cell mui-media">
+			       <label class="mui-pull-left">其他说明：</label>
+			       <label class="mui-pull-loading"  id="beta"></label>
+		       </li>
+			</ul>
+			<script >
+		     mui.plusReady(function() {
+	                kj.context = kj.initContext();
+	                kj.shop = kj.initShop();
+	                var self = plus.webview.currentWebview();
+					var arrive=self.arrive;
+		     		document.getElementById("arrive").innerHTML = arrive;
+		     		var orderNumber=self.orderNumber;
+		     		document.getElementById("orderNumber").innerHTML =orderNumber;
+		     		var addtime=self.addtime;
+		     		document.getElementById("oderTime").innerHTML = addtime;
+		     		var mobile=self.mobile;
+		     	    document.getElementById("oderPhone").innerHTML =mobile;
+		     	    var address=self.address;
+		     		document.getElementById("oderAddr").innerHTML = address;
+		     		var beta=self.beta;
+		     		document.getElementById("beta").innerHTML = beta;
+		     		var shopName=self.shopName;
+		     		document.getElementById("shopName").innerHTML ="店铺名称："+shopName;
+		     		var oderState=kj.context.get("oderState");
+		     		document.getElementById("oderState").innerHTML = oderState;
+	            });
+	     </script>
+		</div>
+       
+        <div id="comment" align="left" style="display: none;"> 
+            <ul class="mui-table-view" id="commentInfo">
+            	<li class="mui-table-view-divider">我的评价</li>
+            	<li class="mui-table-view-cell mui-media ">
+            		<div class="mui-pull-left">
+            		<label class="shop-header" >
+            			<section class="shop-comment-section ">
+							<div id="shop-comment-five"></div> 
+						</section>
+            		</label>
+            		</div>
+            		</li>
+            	  <li class="mui-table-view-cell mui-media">
+            		<label class="mui-pull-loading"  id="info"></label>
+            		</li>
+            </ul>
+        </div>
+       
+       
+       <div id="changeOderState"    style="display:block;">
+        	<table width="100%" align="left">
+        	<tr><th><button class=" mui-btn-yellow" id="oderbte"></button></th></tr>
+		 </table>
+		</div>
+       <div id="refuse"  class="mui-content"  style="display:none;">
+        	<table width="100%" align="left">
+        	<tr><th><button class=" mui-btn-yellow" id="refuseBtn">拒绝订单</button></th></tr>
+		 </table>
+		</div>
+		
+		
+		
+<script>
+			mui.plusReady(function() {
+                kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+               	  var self = plus.webview.currentWebview();
+				  var oderState=kj.context.get("oderState");
+                  var userInfo = kj.context.get("userInfo");
+                  var oderShopID=self.shopID;
+                  var div = document.getElementById("refuse");
+                  
+                  if(userInfo.type=="default"){
+                  	if(oderState=="订单完成（未评价）"){
+                  		document.getElementById("oderbte").innerHTML = "评价";
+                  		kj.context.set("btnStata", 4);
+                  	}else if(oderState=="订单完成（已评价）"){
+                  		document.getElementById("changeOderState").innerHTML = "订单已完成!";
+                  	}else{
+                  		document.getElementById("changeOderState").innerHTML = "订单处理中！";
+                  	}
+                  }else if(userInfo.type=="shop"){
+                  	if(oderState=="等待店铺接单"){
+                  		document.getElementById("oderbte").innerHTML = "接受订单";
+                  		div.style.display = 'block';
+                  		kj.context.set("btnStata", 1);
+                  	}else if(oderState=="店铺已接单"){
+                  		document.getElementById("oderbte").innerHTML = "已收取";
+                  		kj.context.set("btnStata", 2);
+                  	}else if(oderState=="洗涤中"){
+                  		document.getElementById("oderbte").innerHTML = "已送返";
+                  		kj.context.set("btnStata", 3);
+                  	}else if(oderState=="订单完成（未评价）" || oderState=="订单完成（已评价）"){
+                  		document.getElementById("changeOderState").innerHTML = "订单已完成！";
+                  	}
+                  }
+					  	
+				 kj.shop.getComment("",self.orderID,function(date) {
+				 	console.log("查询评论日志-------result:" + date);
+				 	if(date[0]){
+				 		var div = document.getElementById("comment");
+				 		div.style.display = 'block';
+				 		/*document.getElementById("score").innerHTML = date[0].comment_val;*/
+				 		if (date[0].comment_val == 0) {
+				           document.getElementsByTagName('div')[4].id="shop-comment-five";
+				        }else if(date[0].comment_val>0 && date[0].comment_val<=0.5){
+				        	document.getElementsByTagName('div')[4].id="shop-comment-half";
+			            }else if(date[0].comment_val>0.5 && date[0].comment_val<=1){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-one";
+			            }else if(date[0].comment_val>1 && date[0].comment_val<=1.5){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-one-half";
+			            }else if(date[0].comment_val>1.5 && date[0].comment_val<=2){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-two";
+			            }else if(date[0].comment_val>2 && date[0].comment_val<=2.5){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-two-half";
+			            }else if(date[0].comment_val>2.5 && date[0].comment_val<=3){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-three";
+			            }else if(date[0].comment_val>3 && date[0].comment_val<=3.5){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-three-half";
+			            }else if(date[0].comment_val>3.5 && date[0].comment_val<=4){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-four";
+			            }else if(date[0].comment_val>4 && date[0].comment_val<=4.5){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-four-half";
+			            }else if(date[0].comment_val>4.5 && date[0].comment_val<=5){
+			            	document.getElementsByTagName('div')[4].id="shop-comment-five";
+			            }
+				 		document.getElementById("info").innerHTML = date[0].comment_beta;
+				 	}
+				 });
+					  	
+                 document.getElementById("oderbte").onclick = function() {
+                    var stata = kj.context.get("btnStata");
+                    var oderID=self.orderID;
+                    var userID=userInfo.id;
+                    if(stata==4){
+                    	kj.shop.openWithMui("comment.html", "comment", true, {
+	                	oderShopID: oderShopID,
+	                	oderID: oderID,
+	                	userID: userID
+           	 					});
+           	 			 setTimeout(function() {
+		                  	mui.currentWebview.close();
+		                  }, 3000);//1.5秒之后关闭订单页面	
+                    }else{
+                    	kj.shop.changeOderStata(oderID,stata,function() {
+                    mui.toast('操作成功');
+                    plus.webview.getWebviewById("pullrefresh-main.html").reload();
+                    setTimeout(function() {
+                           /*plus.webview.getWebviewById("oderDetail").reload();*/
+                           mui.currentWebview.close();
+                        	}, 1500);//1.5秒之后关闭订单页面
+                		});
+                    }
+                }
+                 
+                 document.getElementById("refuseBtn").onclick = function() {
+                    var userInfo = kj.context.get("userInfo");
+                    var stata = kj.context.get("btnStata");
+                    var oderID=self.orderID;
+                    var phone=userInfo.name;
+                    	kj.shop.openWithMui("refuseReasons.html", "refuseReasons", true, {
+	                	stata: stata,
+	                	oderID: oderID,
+	                	phone: phone
+           	 					});
+           	 			 setTimeout(function() {
+		                  	mui.currentWebview.close();
+		                  }, 3000);//1.5秒之后关闭订单页面	
+                }
+            });
+            
+            document.getElementById("shopName").addEventListener("tap", function() {
+                 	 var oderShopID=kj.context.get("oderShopID");
+					kj.shop.showShopInfo(oderShopID);
+				    kj.shop.openWithLoading("shop.html", "shop.html", null, function(webview) {
+				        webview.evalJS("setBaseInfo();");
+			    });
+			
+				});	
+		</script>
+    </body>
+</html>

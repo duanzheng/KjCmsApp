@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>开心洗衣</title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/font-awesome.min.css" rel="stylesheet" />
+		<link href="css/main.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+		</script>
+	</head>
+
+	<body>
+		<div class="icon-container">
+			<i class="fa fa-exclamation-circle fa-5x"></i>
+			<br />
+			<br /> 网络连接异常
+		</div>
+		<div class="button-container">
+			<button id = "reload" class="mui-btn mui-btn-success mui-btn-outlined">
+				重新加载
+			</button>
+		</div>
+		<script type="text/javascript">
+			mui.plusReady(function(){
+			            document.getElementById("reload").addEventListener("tap", function() {
+			                plus.webview.getWebviewById("index.html").reload();
+			            });
+					});
+		</script>
+	</body>
+
+</html>

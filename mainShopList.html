@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>开心洗衣</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/main.css">
+		<script src="js/app.js"></script>
+		<script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+        <script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>
+        <script type="text/javascript" src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
+	</head>
+	<body>
+		<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<ul class="mui-table-view" id="main-shoplist">
+				</ul>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var ws = null,wo = null;
+		mui.init({
+			swipeBack : false,
+			pullRefresh: {
+				container: '#refreshContainer',
+				down: {
+					callback: pulldownRefresh
+				}
+			}
+		});
+		
+		mui.plusReady(function() {
+			kj.context = kj.initContext();
+			kj.shop = kj.initShop();
+			
+			// 获取自身窗口
+			ws = plus.webview.currentWebview();
+			wo = ws.opener();
+				
+			//show shop list
+			console.log("draw shop list");
+			kj.shop.drawShopList("main-shoplist");
+		});
+		
+		/**
+		 * 下拉刷新具体业务实现
+		 */
+		function pulldownRefresh() {
+			var self = this;
+			setTimeout(function() {
+				kj.shop.drawShopList("main-shoplist");
+				if (mui.os.plus && mui.os.android) {
+						ws.endPullToRefresh();
+						wo.evalJS("pullReset()");
+				} else {
+					self.endPulldownToRefresh(); //refresh completed
+				}
+			}, 1000);
+		}
+	</script>
+</html>

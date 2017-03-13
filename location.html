@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>开心洗衣</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/main.css">
+		<script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+		<script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body class="shop-body">
+		<header class="mui-bar mui-bar-nav location-header">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">切换位置</h1>
+			<!--<div id="input-container" class="mui-input-row mui-search">-->
+				<input type="search" id="ioc-search" class="mui-input-clear" placeholder="请输入要切换的地址" disabled="disabled">
+			<!--</div>-->
+			<div class="locme-section"  id="btnSetCurrentLoc">
+				<span class="mui-icon mui-icon-map"></span>
+				点击定位当前地址
+			</div>
+			<div class="lochis-section">
+				<label>历史位置</label>
+			</div>
+		</header>
+		<div class="mui-content loc-content">
+			<ul class="mui-table-view" id="loc-list">
+			</ul>
+		</div>
+		<script>
+		    var selectLocation = function(id) {
+                kj.shop.selectLocation(id);
+            };
+            var selectGeoLocation = function(id, name) {
+            	console.log("selectGeoLocation");
+                plus.webview.getWebviewById("index.html").evalJS("selectGeoLocation('" + id + "', '" + name + "')");
+                mui.currentWebview.close();
+            };
+            var selectCurrentLocation = function() {
+                console.log("selectCurrentLocation");
+                plus.webview.getWebviewById("index.html").evalJS("selectCurrentLoc()");
+                mui.currentWebview.close();
+            };
+            mui.init({
+                preloadPages:[{
+                    url:"locsearch.html",
+                    id:"locsearchpage"
+                }]
+            });
+			mui.plusReady(function() {
+				kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+                kj.shop.drawHisLocation("loc-list");
+                document.getElementById("ioc-search").addEventListener("tap", function() {
+                    mui.openWindow({
+		                id: "locgeosearch",
+		                url: "locgeosearch.html",
+		                extras: null,
+		                show: {
+		                    autoShow: true,
+		                    aniShow: "fade-in"
+		                },
+		                waiting: {
+		                    autoShow: false
+		                }
+		            });
+                });
+                document.getElementById("btnSetCurrentLoc").addEventListener("tap", function() {
+                    selectCurrentLocation();
+                });
+			});
+		</script>
+	</body>
+</html>

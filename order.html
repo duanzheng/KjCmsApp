@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>开心洗衣</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/main.css">
+		<script src="js/mui.min.js"></script>
+		<script src="js/shop.js"></script>
+		<script src="js/shopAjax.js"></script>
+		<script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body class="shop-body">
+		<header class="mui-bar mui-bar-nav order-header">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">订单确认</h1>
+		</header>
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item mui-active">
+				<span class="mui-tab-label"><button class="mui-pull-right mui-btn-yellow" id="btn-order">提交订单</button></span>
+			</a>
+		</nav>
+		<div class="mui-content order-content">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label for="address">联系地址</label>
+					<input id="address" type="text" class="mui-input-speech mui-input-clear" placeholder="请输入您的地址" value="">
+				</div>
+				<div class="mui-input-row">
+					<label for="phone">联系电话</label>
+					<input id="phone" type="text" class=" mui-input-clear" placeholder="请输入您的手机号码" value="" disabled>
+				</div>
+				
+				<div class="mui-input-row">
+					<label for="getOrderTime">取件时间</label>
+					<select id="getOrderTime">
+						 <option value ="0">请选择商家上门取衣时间</option>
+						  <option value ="08:00-09:00">08:00-09:00</option>
+						  <option value ="09:00-10:00">09:00-10:00</option>
+						  <option value="10:00-11:00">10:00-11:00</option>
+						  <option value="11:00-12:00">11:00-12:00</option>
+						  <option value ="12:00-13:00">12:00-13:00</option>
+						  <option value ="13:00-14:00">13:00-14:00</option>
+						  <option value="14:00-15:00">14:00-15:00</option>
+						  <option value="15:00-16:00">15:00-16:00</option>
+						  <option value ="16:00-17:00">16:00-17:00</option>
+						  <option value ="17:00-18:00">17:00-18:00</option>
+						  <option value="18:00-19:00">18:00-19:00</option>
+						  <option value="19:00-20:00">19:00-20:00</option>
+						  <option value ="20:00-21:00">20:00-21:00</option>
+						  <option value="21:00-22:00">21:00-22:00</option>
+						  <option value="22:00-23:00">22:00-23:00</option>
+						</select>
+				</div>
+				
+				
+				<div class="mui-input-row">
+					<label for="other">其他说明</label>
+				</div></form>
+				<textarea id="other" rows="5" placeholder="有任何其他要求请留言"></textarea>
+			
+			
+			
+		</div>
+		<script>
+			mui.plusReady(function() {
+                kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+				var userInfo=kj.context.get("userInfo");
+				var username=userInfo.name;
+				document.getElementById("phone").value=username;
+				
+                document.getElementById("btn-order").onclick = function() {
+                    var address = document.getElementById("address").value;
+                    var phone = document.getElementById("phone").value;
+                    var extra = document.getElementById("other").value;
+                    var getOrderTime = document.getElementById("getOrderTime").value; 
+                    if(address.length==0){
+                    	alert("请输入地址！");
+                    	return;
+                    }else if (phone.length==0 ){
+                    	alert("请输入电话号码！");
+                    	return;
+                    }else if (getOrderTime==0 ){
+                    	alert("请输入取衣时间！");
+                    	return;
+                    }
+                    
+//                  console.log("submit order with information");
+//                  console.log(address);
+//                  console.log(phone);
+//                  console.log(extra);
+                    kj.shop.submitOrder(address, phone, extra, getOrderTime, function() {
+                        mui.toast('成功提交订单');
+                        setTimeout(function() {
+                            mui.currentWebview.close();
+                        }, 1500);//1.5秒之后关闭订单页面
+                    });
+                }
+            });
+            
+		</script>
+	</body>
+</html>

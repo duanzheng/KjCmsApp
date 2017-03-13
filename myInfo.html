@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/shopAjax2.js"></script>
+</head>
+<body class="order-body">
+<header class="mui-bar mui-bar-nav order-header">
+    <a class="mui-icon mui-pull-left"></a>
+
+    <h1 class="mui-title">个人中心</h1>
+</header>
+
+<div id="userload" class="mui-content login-container">
+    <div>您还没登陆</div>
+    <div class="login-button-container">
+        <button class="mui-btn mui-btn-success mui-btn-outlined" id="login">
+            &nbsp;&nbsp;登录&nbsp;&nbsp;
+        </button>
+    </div>
+</div>
+<div id="acount" class="mui-content account-container">
+    <div id="username"></div>
+    <div class="login-button-container">
+        <button class="mui-btn mui-btn-success mui-btn-outlined" id="accountManage">
+            账号管理
+        </button>
+    </div>
+</div>
+<div id="manage" style="display: none;background-color: #efeff4;">
+    <ul class="mui-table-view mui-table-view-chevron">
+        <li class="mui-table-view-cell mui-media ">
+            <a class="mui-navigate-right"  id="product">
+                <div class="mui-icon mui-icon-list">
+                    <label style="font-size: 16px;">商品管理</span>
+                </div>
+            </a>
+        </li>
+        <li class="mui-table-view-cell mui-media">
+            <a class="mui-navigate-right" id="action">
+                <div class="mui-icon mui-icon-star">
+                    <label style="font-size: 16px;">活动管理</span>
+                </div>
+            </a>
+        </li>
+    </ul>
+    <br />
+</div>
+<div style="background-color: #efeff4;">
+    <ul class="mui-table-view mui-table-view-chevron">
+        <li class="mui-table-view-cell mui-media ditem">
+            <a class="mui-navigate-right" href="tel:02865784918">
+                <div class="mui-icon mui-icon-phone">
+                	<label style="font-size: 16px;">客服电话</label>
+                </div>
+            </a>
+        </li>
+        <li class="mui-table-view-cell mui-media">
+            <a class="mui-navigate-right" id="addmsg">
+                <div class="mui-icon mui-icon-email">
+                	<label style="font-size: 16px;">意见反馈</label>
+                </div>
+            </a>
+        </li>
+        <li class="mui-table-view-cell mui-media">
+            <a id="us" class="mui-navigate-right">
+                <div class="mui-icon mui-icon-person">
+                	<label style="font-size: 16px;">关于我们</label>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>
+<script>
+    mui.init({
+        swipeBack: false,
+    });
+    mui.plusReady(function () {
+        kj.context = kj.initContext();
+        kj.shop = kj.initShop();
+
+        var username = kj.context.get("username");
+        if (username != null) {
+            document.getElementById("username").innerText = username;
+        }
+        ;
+
+        var userInfo = kj.context.get("userInfo");
+        var div1 = document.getElementById("userload");
+        var div2 = document.getElementById("acount");
+        var div4 = document.getElementById("manage");
+        if (userInfo != null) {
+            div1.style.display = 'none';
+            div2.style.display = 'block';
+            if (userInfo.type == "shop") {
+                div4.style.display = 'block';
+            }
+        }
+    });
+
+    document.getElementById('login').addEventListener('tap', function () {
+        console.log("tap on tabSelf input box !");
+        kj.shop.openWithMui("login.html", "login", true);
+    });
+    document.getElementById('accountManage').addEventListener('tap', function () {
+        console.log("tap on accountManage input box !");
+        kj.shop.openWithMui("changeInfo.html", "changeInfo", true);
+    });
+    document.getElementById('us').addEventListener('tap', function () {
+        kj.shop.openWithMui("us.html", "us", true);
+    });
+    document.getElementById('product').addEventListener('tap', function () {
+        kj.shop.openWithMui("productEdit.html", "productEdit", true);
+    });
+    document.getElementById('action').addEventListener('tap', function () {
+        kj.shop.openWithMui("editShopinfo.html", "editShopinfo", true);
+    });
+    document.getElementById('addmsg').addEventListener('tap', function() {
+	    kj.shop.openWithMui("addmsg.html", "addmsg",true);
+	});
+</script>
+</body>
+</html>

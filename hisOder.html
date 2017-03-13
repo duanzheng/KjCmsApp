@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/shopAjax.js"></script>
+    <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav order-header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+    <h1 class="mui-title">订单查询</h1>
+</header>
+<br/><br/><br/>
+
+<div class="mui-input-row mui-search" style="margin-left: 5px;margin-right: 5px;">
+    <input id="keyWord" type="url" class="mui-input-clear" placeholder="请输入订单号或手机号">
+</div>
+<div style="text-align: center;margin-bottom: 5px;">
+    <button class="mui-btn mui-btn-success mui-btn-outlined" id="oldOderSerarch">&nbsp;&nbsp;查询&nbsp;&nbsp;</button>
+</div>
+<div>
+    <ul class="mui-table-view" id="oldOderInfo">
+    </ul>
+</div>
+<script>
+    mui.init({
+        swipeBack: false
+    });
+    mui.plusReady(function () {
+        kj.context = kj.initContext();
+        kj.shop = kj.initShop();
+        document.getElementById("oldOderSerarch").onclick = function () {
+            var keyWord = document.getElementById("keyWord").value;
+            if (keyWord.trim().length == 0) {
+                alert("请输入订单号或者手机号");
+                return;
+            } else {
+                kj.shop.drawOldOrderList("oldOderInfo", keyWord);
+            }
+
+        }
+
+    });
+</script>
+</body>
+</html>

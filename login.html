@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>开心洗衣</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/mui.min.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/shopAjax.js"></script>
+    <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body class="order-body">
+<header class="mui-bar mui-bar-nav order-header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+    <h1 class="mui-title">个人中心</h1>
+</header>
+<div class="mui-content">
+    <div style="padding: 10px 10px;">
+        <div id="segmentedControl" class="mui-segmented-control">
+            <a class="mui-control-item mui-active" href="#item1">
+                登录
+            </a>
+            <a class="mui-control-item" href="#item2">
+                注册
+            </a>
+        </div>
+    </div>
+    <div>
+        <div id="item1" class="mui-control-content mui-active">
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>用户名</label>
+                        <input id="name" type="text" class="mui-input-clear" placeholder="请输入您的用户名">
+                    </div>
+                </li>
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>密码</label>
+                        <input id="pwd" type="password" class="mui-input-clear" placeholder="请输入您的密码">
+                    </div>
+                </li>
+            </ul>
+            <br/>
+            <button class="mui-btn mui-btn-primary mui-btn-block" id="login-OK">确定</button>
+        </div>
+        <div id="item2" class="mui-control-content">
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>手机号</label>
+                        <input id="phoneNo" type="text" class="mui-input-clear" placeholder="请输入您的手机号码" value="">
+                    </div>
+                </li>
+            </ul>
+                <br/>
+                <div style="text-align: center;">
+                	<button class="mui-btn mui-btn-primary" id="sendCkeck">点击获取验证码</button>
+                </div>
+                <br/>
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>验证码</label>
+                        <input id="checkNo" type="tel" class="mui-input-clear" placeholder="请输入短信验证码" value="">
+                    </div>
+                </li>
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>设置密码</label>
+                        <input id="newPwd" type="password" class="mui-input-clear" placeholder="请输入密码" value="">
+                    </div>
+                </li>
+                <li class="mui-table-view-cell">
+                    <div class="mui-input-row">
+                        <label>确认密码</label>
+                        <input id="confirPwd" type="password" class="mui-input-clear" placeholder="请再次输入密码" value="">
+                    </div>
+                </li>
+            </ul>
+            <br/>
+            <div class="mui-content">
+                <button class="mui-btn mui-btn-primary mui-btn-block" id="new-OK">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mui.init({
+        swipeBack: true
+    });
+
+    mui.plusReady(function () {
+        kj.context = kj.initContext();
+        kj.shop = kj.initShop();
+
+        document.getElementById("login-OK").onclick = function () {
+            var name = document.getElementById("name").value;
+            var pwd = document.getElementById("pwd").value;
+            kj.context.set("username", name);
+            kj.shop.login(name, pwd, function (data) {
+            	if(data) {
+            		mui.toast('登录成功！');
+                	mui.currentWebview.close();
+            	}
+            	else {
+            		mui.toast('登录失败，请查看网络是否正常连接。');
+            	}
+            });
+        }
+
+        document.getElementById("sendCkeck").onclick = function () {
+            var phoneNo = document.getElementById("phoneNo").value;
+            if (phoneNo.trim().length != 11) {
+                mui.alert("请输入正确的手机号码！");
+                return;
+            }
+            /*mui.toast('正在发送');*/
+            GetNumber();
+            kj.shop.sendCheck(phoneNo, function () {
+				mui.toast('发送成功');
+            });
+        }
+
+        document.getElementById("new-OK").onclick = function () {
+            var phoneNo = document.getElementById("phoneNo").value;
+            var checkNo = document.getElementById("checkNo").value;
+            var pwd = document.getElementById("newPwd").value;
+            var confirPwd = document.getElementById("confirPwd").value;
+            if (phoneNo.trim().length != 11) {
+                mui.alert("请输入正确的手机号码！");
+                return;
+            }
+            //如果接口有验证则去掉
+            if (phoneNo.trim().length == 0 || checkNo.trim().length == 0 || pwd.trim().length == 0 || confirPwd.trim().length == 0) {
+                mui.alert("请输入完整信息！");
+                return;
+            }
+            //如果接口有验证则去掉
+            if (pwd.trim().length != confirPwd.trim().length) {
+                mui.alert("两次密码输入不一致！");
+                return;
+            }
+            var sysCheckNo = kj.context.get("checkNo");
+            if (sysCheckNo != checkNo) {
+                mui.alert("验证码错误！");
+                return;
+            }
+
+            kj.shop.newUser(phoneNo, pwd, function (data) {
+            	if (data) {
+            		mui.toast('注册成功');
+            	}
+            	else {
+            		mui.toast('注册失败，请检查网络是否正常连接。');
+            	}
+            });
+            //注册成功后自动登录
+            kj.shop.login(phoneNo, pwd, function () {
+            	mui.currentWebview.close();
+            });
+        }
+
+        var count = 30;
+
+        function GetNumber() {
+            document.getElementById("sendCkeck").disabled = true;
+            document.getElementById("sendCkeck").innerHTML = count + "秒之后点击获取";
+            count--;
+            if (count > 0) {
+                setTimeout(GetNumber, 1000);
+            }
+            else {
+                document.getElementById("sendCkeck").innerHTML = "点击获取验证码";
+                document.getElementById("sendCkeck").disabled = false;
+                count = 30;
+            }
+        }
+    });
+</script>
+</body>
+</html>

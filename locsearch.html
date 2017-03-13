@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>开心洗衣</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="css/mui.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+        <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body class="locsearch-body">
+        <header class="mui-bar mui-bar-nav locsearch-header">
+            <input type="text" id="searchInput" placeholder="     请输入关键字" />
+            <span class="mui-icon mui-icon-search locsearch-icon"></span>
+            <a class="mui-btn mui-btn-link" id="btnCancel" style="color: #FFFFFF;">取消</a>
+        </header>
+        <div class="mui-content shopsearch-content">
+            <ul class="mui-table-view" id="locsearch-list">
+            </ul>
+            <script>
+                //TODO draw history location list
+            </script>
+        </div>
+        <script>
+        	var btnCancel = document.getElementById("btnCancel");
+            var cancelWidth = btnCancel.offsetWidth;
+            var inputWidth = window.innerWidth - cancelWidth - 30;
+            var searchInput = document.getElementById("searchInput");
+            searchInput.style.width = inputWidth + "px";
+
+            btnCancel.addEventListener("tap", function() {
+                mui.currentWebview.close();
+            });
+                
+            var selectGeoLocation = function(id, name) {
+                kj.shop.selectGeoLocation(id, name);
+            };
+            
+            var drawResultList = function(text) {
+            	
+            };
+
+            mui.plusReady(function() {
+                kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+
+				var shopListData = kj.context.get("currentShopList");
+				
+				var domHtml = '';
+				for (var i = 0; i < shopListData.length; i++) {
+					var item = shopListData[i];
+					var shopDesc = item.extend.arrivedelay + "分钟送达 / " + item.shop_dispatch_price + "元起送";
+					domHtml += '<li class="mui-table-view-cell mui-media">';
+					domHtml += '<a onclick="kj.shop.showShopInfo(' + item.shop_id + ', \'' + item.shop_name + '\');">';
+					domHtml += '<div class="mui-media-body"><h4>' + item.shop_name + '</h4>';
+					domHtml += '<p class="mui-ellipsis">' +  shopDesc + '</p></div></a></li>';
+				}
+				
+				document.getElementById("locsearch-list").innerHTML = domHtml;
+
+                var _list = document.getElementById("locsearch-list").getElementsByTagName("li");
+                var _searchWord = function(keyword) {
+                    console.log("search size:" + _list.length);
+                    if (_list && _list.length > 0) {
+                        for (var i = 0; i < _list.length; i++) {
+                        var li = _list[i];
+                            if (li.innerHTML.indexOf(keyword) > 0) {
+                                li.style.display = "block";
+                            } else {
+                                li.style.display = "none";
+                            }
+                        }
+                    }
+                };
+
+                var searchText = "";
+
+                // 此框架中监听不到input输入变化事件，只能先用timer定时检测的方式，待改善
+                var checkTextChange = function() {
+                    var text = searchInput.value;
+                    if (text != null) {
+                        if (text != searchText) {
+                            searchText = text;
+                            _searchWord(searchText);
+                        }
+                    }
+                    setTimeout(checkTextChange, 1000);
+                };
+
+                checkTextChange();
+            });
+        </script>
+    </body>
+</html>

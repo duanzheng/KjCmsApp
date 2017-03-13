@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>开心洗衣</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="stylesheet" href="css/mui.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/mui.min.js"></script>
+        <script src="js/shop.js"></script>
+        <script src="js/shopAjax.js"></script>
+        <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body class="order-body">
+        <header class="mui-bar mui-bar-nav order-header">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">拒绝接单</h1>
+        </header>
+       <div></div>
+       <br /><br /><br /><br />
+       <div class="mui-content order-content">
+			<form class="mui-input-group">
+       <div class="mui-input-row">
+					<label for="refuseReason">拒绝原因：</label>
+					<select id="refuseReason">
+						 <option value ="0">请选择拒绝原因</option>
+						  <option value ="不在配送范围">不在配送范围</option>
+						  <option value ="不在配送时间段">不在配送时间段</option>
+						  <option value="店内太忙">店内太忙</option>
+						  <option value ="其他">其他</option>
+						</select>
+				</div>
+				</form>
+        		
+				</div>
+				<br />
+		<div align="center">
+			<button class="mui-btn-green" id="OK">确    定</button>
+		</div>
+<script>
+			mui.plusReady(function() {
+                kj.context = kj.initContext();
+                kj.shop = kj.initShop();
+                var self = plus.webview.currentWebview();
+				
+				document.getElementById("OK").onclick = function() {
+					var refuseReason=document.getElementById("refuseReason").value;
+					if(refuseReason==0){
+						mui.alert("请选择拒绝原因！");
+					}else{
+						kj.shop.refuseOder(self.phone,self.oderID,refuseReason,function() {
+							kj.shop.changeOderStata(oderID,"9",function() {
+								plus.webview.getWebviewById("pullrefresh-main.html").reload();
+								mui.toast('操作成功');
+				                setTimeout(function() {
+				                  	mui.currentWebview.close();
+				                  }, 1500);//1.5秒之后关闭订单页面
+							});
+		                });
+					}
+						
+                }
+            });
+            
+		</script>
+    </body>
+</html>
